@@ -44,7 +44,7 @@
             </div>
             {% if request.user.is_authenticated %}
             <div class="card-footer">
-                <div class="btn-list">  
+                <div class="btn-list">
                     <button class="btn rounded-right terrarium_edit_button green_button"><i class="fa-solid fa-pen-to-square"></i></button>
                     <button class="btn rounded-right terrarium_feeding_button green_button"><i class="fa-solid fa-utensils"></i></button>
                     <button class="btn rounded-right terrarium_history_button green_button"><i class="fa-regular fa-calendar-plus"></i></button>
@@ -125,7 +125,7 @@
                         <tbody>
                             {% for lamp in lamps %}
                             <tr data-id="{{ lamp.id }}" class="lamp_edit active_row no-select">
-                                <td>{{ lamp.type }}</td>
+                                <td>{{ lamp.lamp_type }}</td>
                                 <td>{{ lamp.watt}}</td>
                                 <td>{{ lamp.position}}</td>
                                 <td>{{ lamp.changed | dateformat }}</td>
@@ -234,7 +234,7 @@
 <script type="text/javascript" >
     $(document).on("click",".show_animal",function(){
             var animal_id = $(this).data('id');
-            window.location.assign("/animal/"+animal_id); 
+            window.location.assign("/animal/"+animal_id);
         });
 
     $('#animals').dataTable({
@@ -249,12 +249,12 @@
     $(document).ready(function(){
         $('.show_terrarium_image').click(function(){
             $('.modal-content').html('<div class="modal-body"><img src="{{ image }}" class="rounded img-fluid mx-auto"></div>')
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
         $('.show_all_history').click(function(){
             if ($(this).html().includes("less")) {
                 url = '/terrarium/history/get_all/{{ terrarium.id }}?less=1'
-                $('.show_all_history').html('<div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>');                
+                $('.show_all_history').html('<div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>');
             } else {
                 url = '/terrarium/history/get_all/{{ terrarium.id }}'
                 $('.show_all_history').html('<div style="text-transform: uppercase;"> <i class="fa-solid fa-chevron-left"></i></i> {{ _("Show less") }}</div>');
@@ -271,7 +271,7 @@
     {% if request.user.is_authenticated %}
     $('.terrarium_edit_button').on('click',function(){
         $('.modal-content').load('/terrarium/edit/{{ terrarium.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
             $('.terrarium_delete_button').click(function(){
                                 var terrarium_id = $(this).data('id');
                                 if (confirm("Are You Sure ?")) {
@@ -280,7 +280,7 @@
                                             type: 'post',
                                             data: {terrarium_id: {{ terrarium.id }}},
                                             success: function(data) {
-                                                window.location.replace("/"); 
+                                                window.location.replace("/");
                                             }
                                         });
                                 }
@@ -301,8 +301,8 @@
         $.ajax({
             url: '/terrarium/equipment/edit/'+feed_id,
             type: 'get',
-            success: function(data){ 
-                $('.modal-content').html(data); 
+            success: function(data){
+                $('.modal-content').html(data);
                 $('.modal-content').append(data.htmlresponse);
                 $('#modal_details').modal('show');
                 $('.equipment_delete_button').click(function(){
@@ -313,7 +313,7 @@
                                 type: 'post',
                                 data: {terrarium_id: {{ terrarium.id }}},
                                 success: function(data) {
-                                    location.reload(true); 
+                                    location.reload(true);
                                 }
                             });
                     }
@@ -327,8 +327,8 @@
         $.ajax({
             url: '/terrarium/lamp/edit/'+feed_id,
             type: 'get',
-            success: function(data){ 
-                $('.modal-content').html(data); 
+            success: function(data){
+                $('.modal-content').html(data);
                 $('.modal-content').append(data.htmlresponse);
                 $('#modal_details').modal('show');
                 $('.lamp_delete_button').click(function(){
@@ -339,7 +339,7 @@
                                 type: 'post',
                                 data: {terrarium_id: {{ terrarium.id }}},
                                 success: function(data) {
-                                    location.reload(true); 
+                                    location.reload(true);
                                 }
                             });
                     }
@@ -353,8 +353,8 @@
         $.ajax({
             url: '/terrarium/history/edit/'+feed_id,
             type: 'get',
-            success: function(data){ 
-                $('.modal-content').html(data); 
+            success: function(data){
+                $('.modal-content').html(data);
                 $('.modal-content').append(data.htmlresponse);
                 $('#modal_details').modal('show');
                 $('.history_delete_button').click(function(){
@@ -365,7 +365,7 @@
                                 type: 'post',
                                 data: {terrarium_id: {{ terrarium.id }}},
                                 success: function(data) {
-                                    location.reload(true); 
+                                    location.reload(true);
                                 }
                             });
                     }
@@ -376,13 +376,13 @@
 
     $('.equipment_add_button').on('click',function(){
         $('.modal-content').load('/terrarium/equipment/add/{{ terrarium.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
     });
 
     $('.lamp_add_button').on('click',function(){
         $('.modal-content').load('/terrarium/lamp/add/{{ terrarium.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
     });
 

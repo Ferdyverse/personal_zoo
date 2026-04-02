@@ -7,7 +7,7 @@
     <div class="modal-body" id="modal-body">
         <div class="row">
             <div class="col">
-                {{ render_text_field(form.type) }}
+                {{ render_text_field(form.lamp_type) }}
             </div>
             <div class="col">
                 {{ render_text_field(form.watt) }}
@@ -20,7 +20,7 @@
             <div class="col">
                 {{ render_text_field(form.changed) }}
             </div>
-        </div>    
+        </div>
     </div>
     <input type="hidden" id="terrarium_id" name="terrarium_id" value="{{ data.terrarium }}" />
     <div class="modal-footer">
@@ -32,5 +32,5 @@
 </form>
 
 <script>
-    $('#changed').val(new Date().toISOString().slice(0, 10));
+    $('#id_changed').val(new Date().toISOString().slice(0, 10));
 </script>
