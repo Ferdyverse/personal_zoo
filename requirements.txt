@@ -2,6 +2,7 @@
 Django>=5.2,<7.0
 django-unfold>=0.40.0
 python-dotenv==1.0.0
+gunicorn>=21.0.0
 
 # Template engine (Jinja2 for Django)
 Jinja2>=3.1.2
