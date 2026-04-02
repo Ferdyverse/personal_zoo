@@ -20,7 +20,7 @@
                 <!-- Home -->
                 {{ render_nav_item(_("Home"), "fa-solid fa-house", "/", "home", location) }}
 
-                {% if current_user.is_authenticated %}
+                {% if request.user.is_authenticated %}
 
                 <!-- Multi Feeding -->
                 {{ render_nav_item(_("Multi Feeding"), "fa-solid fa-utensils", "/feeding/multi", "multi_feeding", location) }}
@@ -47,7 +47,9 @@
                 {{ render_nav_item(_("Print"), "fa-solid fa-print", "/print", "print", location) }}
 
                 <!-- Settings -->
-                {{ render_nav_item(_("Settings"), "fa-solid fa-gear", "/settings", "settings", location) }}
+                {% if request.user.is_staff %}
+                {{ render_nav_item(_("Settings"), "fa-solid fa-gear", "/admin/", "settings", location) }}
+                {% endif %}
 
                 <li class="nav-item dropdown text-center mx-2 mx-lg-1">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAccount" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -58,11 +60,11 @@
                     </a>
                     <!-- Dropdown menu -->
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownAccount">
-                        {% if current_user.is_admin %}
-                        <li><a class="dropdown-item {% if location == 'account' %}active{% endif %}" href="{{ url_for('accounts.admin') }}">{{ _("Admin settings") }}</a></li>
+                        {% if request.user.is_staff %}
+                        <li><a class="dropdown-item {% if location == 'account' %}active{% endif %}" href="{{ url('accounts:admin') }}">{{ _("Admin settings") }}</a></li>
                         {% endif %}
                         <li><a class="dropdown-item {% if location == 'profile' %}active{% endif %}" href="/account">{{ _("Your Profile") }}</a></li>
-                        <li><a class="dropdown-item {% if location == 'logout' %}active{% endif %}" href="{{ url_for('accounts.logout') }}">{{ _("Logout") }}</a></li>
+                        <li><a class="dropdown-item {% if location == 'logout' %}active{% endif %}" href="{{ url('accounts:logout') }}">{{ _("Logout") }}</a></li>
                     </ul>
                 </li>
                 {% else %}
@@ -76,12 +78,12 @@
                     </a>
                     <!-- Dropdown menu -->
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownAccount">
-                        <li><a class="dropdown-item {% if location == 'login' %}active{% endif %}" href="{{ url_for('accounts.login') }}">{{ _("Login") }}</a></li>
-                        <li><a class="dropdown-item {% if location == 'register' %}active{% endif %}" href="{{ url_for('accounts.register') }}">{{ _("Register") }}</a></li>
+                        <li><a class="dropdown-item {% if location == 'login' %}active{% endif %}" href="{{ url('accounts:login') }}">{{ _("Login") }}</a></li>
+                        <li><a class="dropdown-item {% if location == 'register' %}active{% endif %}" href="{{ url('accounts:register') }}">{{ _("Register") }}</a></li>
                     </ul>
                 </li>
-                {% endif %} 
-            </ul>            
+                {% endif %}
+            </ul>
 
             <!-- Icons -->
             <ul class="navbar-nav flex-row flex-wrap ms-md-auto">

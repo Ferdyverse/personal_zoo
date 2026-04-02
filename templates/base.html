@@ -1,4 +1,4 @@
-{% set ns = namespace(error=false) %} 
+{% set ns = namespace(error=false) %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,6 +21,13 @@
     <!-- ColorMode -->
     <script src="{{ url_for('static', filename='js/color_mode.js') }}"></script>
 
+    <!-- CSRF token for all jQuery AJAX requests -->
+    <script>
+        $.ajaxSetup({
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        });
+    </script>
+
     <!-- mobile render fix -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -33,13 +40,14 @@
     <!-- spacer for nav -->
     <div class="no-print" style="margin-top: 50px;"></div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
+    {% set django_messages = get_messages(request) %}
+    {% if django_messages %}
         <div class="container mt-5 fade show" id="flash-message">
-            {% for category, message in messages %}
+            {% for message in django_messages %}
+                {% set category = message.tags if message.tags else 'info' %}
                 <div class="alert alert-{{ category }} alert-dismissible" role="alert">
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    {{ message | linebreaksbr | safe }}
+                    {{ message | string | linebreaksbr | safe }}
                 </div>
                 {% if category == "danger" %}
                     {% set ns.error = true %}
@@ -47,7 +55,6 @@
             {% endfor %}
         </div>
     {% endif %}
-    {% endwith %}
 
     <div class="container">
         <p>&nbsp;</p>
@@ -60,7 +67,7 @@
     <footer class="footer mt-auto text-center text-lg-start">
         <!-- Copyright -->
         <div class="text-center p-3">
-            © {{ momentjs().format('YYYY') }} Copyright:
+            © {{ now().year }} Copyright:
             <a target="_blank" href="https://personal-zoo.com/">personal-zoo.com</a>
         </div>
         <!-- Copyright -->

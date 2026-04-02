@@ -1,0 +1,78 @@
+{% from "macros/fields.html" import render_text_field, render_select_field, render_selectpicker_field %}
+
+{% extends 'base.html' %}
+
+{% block title %}Personal Zoo | {{ _("Add Feeding") }}{% endblock %}
+
+{% block head %}
+    <style>
+        nav {
+            display: none !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="row row-cols-lg-1 row-cols-sm-1">
+    <div class="card m-0 p-0">
+        <div class="card-header">
+            <div class="flex-grow"> {{ _("Add Feeding for") }} {{ animal }}</div>
+            <div class="btn-list">
+                <!-- no button -->
+            </div>
+        </div>
+        <form action="{{ target }}" method="post" enctype="multipart/form-data">
+            {{ csrf_input }}
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        {{ render_text_field(form.date) }}
+                    </div>
+                    <div class="col">
+                        {{ render_select_field(form.type) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_text_field(form.count) }}
+                    </div>
+                    <div class="col unit">
+                        {{ render_text_field(form.unit) }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <button type="submit" class="btn btn-primary">{{ _("Save") }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $('#id_date').val(new Date().toISOString().slice(0, 10));
+
+    {% if dft %}$('#id_type').val('{{ dft }}');{% endif %}
+
+    var ft = $('#id_type').val();
+    if (ft) {
+        $.ajax({
+            url: '/feeding/get_units/'+ft,
+            type: 'get',
+            success: function(data){
+                $('.unit').html(data);
+            }
+        });
+    }
+
+    $('#id_type').change(function(){
+        var ft = $(this).val();
+        $.ajax({
+            url: '/feeding/get_units/'+ft,
+            type: 'get',
+            success: function(data){
+                $('.unit').html(data);
+            }
+        })
+    });
+</script>
+{% endblock %}

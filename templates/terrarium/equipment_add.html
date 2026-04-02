@@ -1,0 +1,26 @@
+{% from "macros/fields.html" import render_text_field, render_select_field, render_selectpicker_field, render_clear_text_field %}
+
+<div class="modal-header">
+    <h5 class="modal-title" id="itemLabel">{{ _("Add equipment") }}</h5>
+</div>
+<form action="{{ url_for('terrarium.equipment_add', id=data.id) }}" method="post" enctype="multipart/form-data">
+    {{ csrf_input }}
+    <div class="modal-body" id="modal-body">
+        <div class="row">
+            <div class="col">
+                {{ render_text_field(form.name) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{ render_text_field(form.text) }}
+            </div>
+        </div>    
+    </div>
+    <div class="modal-footer">
+        <div class="text-end">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Cancel") }}</button>
+            <button type="submit" class="btn btn-primary">{{ _("Save") }}</button>
+        </div>
+    </div>
+</form>

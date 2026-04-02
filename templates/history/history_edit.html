@@ -1,0 +1,55 @@
+{% from "macros/fields.html" import render_text_field, render_select_field, render_textarea_field %}
+
+<div class="modal-header">
+    <h5 class="modal-title" id="itemLabel">{{ _("Edit event/action") }}</h5>
+</div>
+<form role="form" id="history_form" method="post" action="{{ target }}" enctype="multipart/form-data">
+    {{ csrf_input }}
+
+    <div class="modal-body" id="modal-body">
+        <div class="row">
+            <div class="col">
+                {{ render_text_field(form.date) }}
+            </div>
+            <div class="col">
+                {{ render_select_field(form.event) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{ render_textarea_field(form.text) }}
+            </div>
+        </div>
+    
+    </div>
+    <div class="modal-footer">
+        <div pos="start">
+            <button type="button" data-id="{{ id }}" class="btn btn-danger text-left history_delete_button">{{ _("Delete") }}</button>
+        </div>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Cancel") }}</button>
+        <button type="submit" id="submit" class="btn btn-primary">{{ _("Save") }}</button>
+    </div>
+</form>
+
+<script>
+    $('#submit').click(function (event) {
+        event.preventDefault();
+        var url = $('#history_form').attr('action');
+        $.post(url, data = $('#history_form').serialize(), function (data) {
+            if (data.status == 'ok') {
+                $('#modal_details').modal('hide'); 
+                location.reload();
+            } else {
+                var obj = JSON.parse(data);
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        var value = obj[key];
+                    }
+                }
+                $('.alert').remove()
+                $('<div class="alert alert-danger" role="alert">' + value +'</div>').insertAfter('#' + key);
+                $('.form-group').addClass('has-error')
+            }
+        })
+    });
+</script>

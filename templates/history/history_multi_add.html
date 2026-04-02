@@ -1,0 +1,59 @@
+{% from "macros/fields.html" import render_text_field, render_select_field, render_selectpicker_field, render_textarea_field %}
+
+{% extends 'base.html' %}
+
+{% block title %}Personal Zoo | Add Multi Event{% endblock %}
+
+{% block head %}
+<!-- Fancy Dropdown -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-select.min.css') }}">
+<script src="{{ url_for('static', filename='js/bootstrap-select.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="flex-grow"> {{ _("Add multi history/event") }}</div>
+    </div>
+    <form role="form" method="post" action="{{ target }}" enctype="multipart/form-data">
+        {{ csrf_input }}
+    
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    {{ render_selectpicker_field(form.animals) }}
+                </div>
+                <div class="col">
+                    {{ render_selectpicker_field(form.terrariums) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{ render_text_field(form.date) }}
+                </div>
+                <div class="col">
+                    {{ render_select_field(form.event) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{ render_textarea_field(form.text) }}
+                </div>
+            </div>
+        
+        </div>
+        <div class="mb-3 ms-3 fs-6"><strong>{{ _("Note:") }}</strong> {{ _("You can select both, animals and/or terrariums.") }}</div>
+        <div class="card-footer text-end">
+            <button type="submit" class="btn btn-primary">{{ _("Save") }}</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    $('#id_date').val(new Date().toISOString().slice(0, 10));
+
+    $('select[name=terrariums]').val( '{{ terrarium or "" }}' );
+    $('.selectpicker').selectpicker('refresh');
+</script>
+{% endblock %}

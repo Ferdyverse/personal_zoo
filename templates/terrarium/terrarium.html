@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+
+{% block title %}Personal Zoo | {{ terrarium.name }}{% endblock %}
+
+{% block head %}
+<!-- Datatables -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}">
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+
+<!-- custom gender colors -->
+<style>
+    .female {
+        color: {{ settings['color_female'][0] }};
+    }
+    .male {
+        color: {{ settings['color_male'][0] }};
+    }
+    .ambiguous {
+        color: {{ settings['color_other'][0] }};
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% set image = url_for("uploaded_file", folder='terrariums', filename=terrarium.image) %}
+
+<div class="row mt-3 mb-4 ">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center align-middle flex-wrap terrarium-head justify-content-center justify-content-md-start">
+                    <div class="terrarium-image"><!---->
+                        <img class="show_terrarium_image rounded object-fit-contain" src="{{ image }}" alt="Image for {{ terrarium.name }}" />
+                    </div>
+                    <div class="px-4">
+                        <div>
+                            <h2 class="d-inline text-start">{{ terrarium.name }}</h2>
+                        </div>
+                        <div class="text-start">{{ terrarium.type }}</div>
+                        <div class="text-muted text-start">Size: {{ terrarium.size }}</div>
+                    </div>
+                </div>
+            </div>
+            {% if request.user.is_authenticated %}
+            <div class="card-footer">
+                <div class="btn-list">  
+                    <button class="btn rounded-right terrarium_edit_button green_button"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn rounded-right terrarium_feeding_button green_button"><i class="fa-solid fa-utensils"></i></button>
+                    <button class="btn rounded-right terrarium_history_button green_button"><i class="fa-regular fa-calendar-plus"></i></button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-lg-2 g-4">
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="flex-grow"> {{ _("Animals") }} </div>
+            </div>
+            <div class="card-body animal_card">
+                {% if animals %}
+                <div class="lamp_card_table">
+                    <table id="animals" class="table table-striped dt-responsive"  style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>{{ _("Name") }}</th>
+                                <th>{{ _("Type") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for animal in animals %}
+                            <tr data-id="{{ animal.id }}" class="active_row show_animal no-select">
+                                <td>
+                                    <div class="d-flex align-items-center align-middle">
+                                        <div class="img-container animal-image-small">
+                                            <img src="{{ url_for('uploaded_file', folder='animals', filename=animal.image) }}" alt="Image for {{ animal.name }}" style="border-color: {{ animal.background_color }} !important;">
+                                        </div>
+                                        <div class="ps-3 flex-shrink-1">
+                                            <div class="pb-1 fw-bold {% if animal.gender == 'female' %}female{% elif animal.gender == 'male' %}male{% else %}ambiguous{% endif %}">
+                                                {{ animal.name }}
+                                            </div>
+                                            <p class="m-0 text-muted fw-normal">{{ animal.morph }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle"><div class="flex-shrink-1 text-break fw-normal">{{ animal.art }}</div></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="mb-0">{{ _("No animals found!") }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer text-right pr-0">
+                <div style="text-transform: uppercase;">{{ _("Anyone in here?") }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="flex-grow"> {{ _("Lamps") }} </div>
+                <div class="btn-list">
+                    {% if request.user.is_authenticated %}
+                    <button class="btn rounded-right lamp_add_button green_button"><i class="fa-solid fa-plus"></i></button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body lamp_card">
+                {% if lamps %}
+                <div class="lamp_card_table">
+                    <table class="table table-striped m-0">
+                        <thead>
+                            <th>{{ _("Type") }}</th>
+                            <th>{{ _("Watt") }}</th>
+                            <th>{{ _("Position") }}</th>
+                            <th>{{ _("Changed") }}</th>
+                        </thead>
+                        <tbody>
+                            {% for lamp in lamps %}
+                            <tr data-id="{{ lamp.id }}" class="lamp_edit active_row no-select">
+                                <td>{{ lamp.type }}</td>
+                                <td>{{ lamp.watt}}</td>
+                                <td>{{ lamp.position}}</td>
+                                <td>{{ lamp.changed | dateformat }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="mb-0">{{ _("No lamps found!") }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer text-right pr-0">
+                <div style="text-transform: uppercase;">{{ _("Light it up!") }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="flex-grow"> {{ _("Equipment") }} </div>
+                <div class="btn-list">
+                    {% if request.user.is_authenticated %}
+                    <button class="btn equipment_add_button green_button"><i class="fa-solid fa-plus"></i></button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body equipment_card">
+                {% if equipment %}
+                <table class="table table-striped m-0">
+                    <tbody>
+                        {% for part in equipment %}
+                        <tr data-id="{{ part.id }}" class="equipment_edit active_row no-select">
+                            <td class="small-cell text-nowrap">{{ part.name }}</td>
+                            <td class="wide-cell">{{ part.text|linebreaksbr|safe }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="mb-0">{{ _("No equipment found!") }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="flex-grow"> {{ _("Events/Actions") }} </div>
+                <div class="btn-list">
+                    {% if request.user.is_authenticated %}
+                    <button class="btn history_add_button green_button"><i class="fa-solid fa-plus"></i></button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body history_card">
+                {% if terrarium_history %}
+                <table class="table table-striped m-0">
+                    <thead>
+                        <th class="w-25">{{ _("Date") }}</th>
+                        <th>{{ _("Event") }}</th>
+                        <th>{{ _("Details") }}</th>
+                    </thead>
+                    <tbody>
+                        {% for event in terrarium_history %}
+                        <tr data-id="{{ event.id }}" class="history_edit active_row no-select">
+                            <td>{{ event.date | dateformat }}</td>
+                            <td>{{ event.name }}</td>
+                            <td>{{ event.text|linebreaksbr|safe }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="mb-0">{{ _("No History found!") }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer card-footer-clickable text-right pr-0 show_all_history">
+                <div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="flex-grow"> {{ _("Notes") }} </div>
+                <div class="btn-list">
+                    <!-- no button -->
+                </div>
+            </div>
+            <div class="card-body">
+                {{ terrarium.notes|linebreaksbr|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_details" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- Will be loaded later -->
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" >
+    $(document).on("click",".show_animal",function(){
+            var animal_id = $(this).data('id');
+            window.location.assign("/animal/"+animal_id); 
+        });
+
+    $('#animals').dataTable({
+        "responsive": true,
+        "paging": false,
+        "order": [[0, 'asc']],
+        "stateSave": true,
+        "searching": false,
+        "info": false
+    });
+
+    $(document).ready(function(){
+        $('.show_terrarium_image').click(function(){
+            $('.modal-content').html('<div class="modal-body"><img src="{{ image }}" class="rounded img-fluid mx-auto"></div>')
+            $('#modal_details').modal('show'); 
+        });
+        $('.show_all_history').click(function(){
+            if ($(this).html().includes("less")) {
+                url = '/terrarium/history/get_all/{{ terrarium.id }}?less=1'
+                $('.show_all_history').html('<div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>');                
+            } else {
+                url = '/terrarium/history/get_all/{{ terrarium.id }}'
+                $('.show_all_history').html('<div style="text-transform: uppercase;"> <i class="fa-solid fa-chevron-left"></i></i> {{ _("Show less") }}</div>');
+            }
+            $.ajax({
+                url: url,
+                type: 'get',
+                success: function(data){
+                    $('.history_card').html(data);
+                }
+            })
+        });
+    });
+    {% if request.user.is_authenticated %}
+    $('.terrarium_edit_button').on('click',function(){
+        $('.modal-content').load('/terrarium/edit/{{ terrarium.id }}',function(){
+            $('#modal_details').modal('show'); 
+            $('.terrarium_delete_button').click(function(){
+                                var terrarium_id = $(this).data('id');
+                                if (confirm("Are You Sure ?")) {
+                                    $.ajax({
+                                            url: '/terrarium/delete/'+terrarium_id+'/',
+                                            type: 'post',
+                                            data: {terrarium_id: {{ terrarium.id }}},
+                                            success: function(data) {
+                                                window.location.replace("/"); 
+                                            }
+                                        });
+                                }
+                            });
+        });
+    });
+
+    $('.terrarium_feeding_button').on('click',function(){
+        window.location.assign("/feeding/multi?terrarium={{ terrarium.id }}");
+    });
+
+    $('.terrarium_history_button').on('click',function(){
+        window.location.assign("/history/multi?terrarium={{ terrarium.id }}");
+    });
+
+    $(document).on("click",".equipment_edit",function(){
+        var feed_id = $(this).data('id');
+        $.ajax({
+            url: '/terrarium/equipment/edit/'+feed_id,
+            type: 'get',
+            success: function(data){ 
+                $('.modal-content').html(data); 
+                $('.modal-content').append(data.htmlresponse);
+                $('#modal_details').modal('show');
+                $('.equipment_delete_button').click(function(){
+                    var feed_id = $(this).data('id');
+                    if (confirm("Are You Sure ?")) {
+                        $.ajax({
+                                url: '/terrarium/equipment/delete/'+feed_id+'/',
+                                type: 'post',
+                                data: {terrarium_id: {{ terrarium.id }}},
+                                success: function(data) {
+                                    location.reload(true); 
+                                }
+                            });
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on("click",".lamp_edit",function(){
+        var feed_id = $(this).data('id');
+        $.ajax({
+            url: '/terrarium/lamp/edit/'+feed_id,
+            type: 'get',
+            success: function(data){ 
+                $('.modal-content').html(data); 
+                $('.modal-content').append(data.htmlresponse);
+                $('#modal_details').modal('show');
+                $('.lamp_delete_button').click(function(){
+                    var feed_id = $(this).data('id');
+                    if (confirm("Are You Sure ?")) {
+                        $.ajax({
+                                url: '/terrarium/lamp/delete/'+feed_id+'/',
+                                type: 'post',
+                                data: {terrarium_id: {{ terrarium.id }}},
+                                success: function(data) {
+                                    location.reload(true); 
+                                }
+                            });
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on("click",".history_edit",function(){
+        var feed_id = $(this).data('id');
+        $.ajax({
+            url: '/terrarium/history/edit/'+feed_id,
+            type: 'get',
+            success: function(data){ 
+                $('.modal-content').html(data); 
+                $('.modal-content').append(data.htmlresponse);
+                $('#modal_details').modal('show');
+                $('.history_delete_button').click(function(){
+                    var feed_id = $(this).data('id');
+                    if (confirm("Are You Sure ?")) {
+                        $.ajax({
+                                url: '/terrarium/history/delete/'+feed_id+'/',
+                                type: 'post',
+                                data: {terrarium_id: {{ terrarium.id }}},
+                                success: function(data) {
+                                    location.reload(true); 
+                                }
+                            });
+                    }
+                });
+            }
+        });
+    });
+
+    $('.equipment_add_button').on('click',function(){
+        $('.modal-content').load('/terrarium/equipment/add/{{ terrarium.id }}',function(){
+            $('#modal_details').modal('show'); 
+        });
+    });
+
+    $('.lamp_add_button').on('click',function(){
+        $('.modal-content').load('/terrarium/lamp/add/{{ terrarium.id }}',function(){
+            $('#modal_details').modal('show'); 
+        });
+    });
+
+    $('.history_add_button').on('click',function(){
+        $('.modal-content').load('/terrarium/history/add/{{ terrarium.id }}',function(){
+            $('#modal_details').modal('show');
+        });
+    });
+    {% endif %}
+</script>
+{% endblock %}
