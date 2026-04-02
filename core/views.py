@@ -1,6 +1,8 @@
+import datetime
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.utils import get_ad, get_tr, get_setting, insert_defaults
+from app_settings.models import Notification
 
 
 def home(request):
@@ -9,11 +11,15 @@ def home(request):
     user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
     phones = ['android', 'iphone']
 
+    today = datetime.date.today()
+    notifications = Notification.objects.filter(date__lte=today).exclude(message='').order_by('date')
+
     context = {
         'animals': get_ad(),
         'terrariums': get_tr(),
         'settings': get_setting(),
         'location': 'home',
+        'notifications': notifications,
     }
 
     if any(phone in user_agent for phone in phones):

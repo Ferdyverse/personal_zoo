@@ -47,6 +47,8 @@
                                         <tr>
                                             <th>{{ _("Name") }}</th>
                                             <th>{{ _("Type") }}</th>
+                                            <th>{{ _("Last Fed") }}</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -66,6 +68,25 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle"><div class="flex-shrink-1 text-break fw-normal">{{ animal.art }}</div></td>
+                                            <td class="align-middle">
+                                                {% if animal.last_feeding %}
+                                                    {% set days = (now().date() - animal.last_feeding).days %}
+                                                    {% if days <= 7 %}
+                                                        <span class="badge bg-success">{{ days }} {{ _("days ago") }}</span>
+                                                    {% elif days <= 14 %}
+                                                        <span class="badge bg-warning text-dark">{{ days }} {{ _("days ago") }}</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">{{ days }} {{ _("days ago") }}</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-danger">{{ _("Never") }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle text-end">
+                                                <button class="btn btn-sm green_button quick_feed_btn" data-id="{{ animal.id }}" data-name="{{ animal.name }}" title="{{ _('Add feeding') }}">
+                                                    <i class="fa-solid fa-utensils"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -116,10 +137,24 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modal_details" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
     <script type="text/javascript">
         $(document).on("click",".show_animal",function(){
             var animal_id = $(this).data('id');
-            window.location.assign("/animal/"+animal_id); 
+            window.location.assign("/animal/"+animal_id);
+        });
+
+        $(document).on('click', '.quick_feed_btn', function(e) {
+            e.stopPropagation();
+            var id = $(this).data('id');
+            $('.modal-content').load('/feeding/add/'+id+'/', function(){
+                $('#modal_details').modal('show');
+            });
         });
 
         $('#animals').dataTable({
@@ -132,7 +167,7 @@
 
         $(document).on("click",".show_terrarium",function(){
             var terrarium_id = $(this).data('id');
-            window.location.assign("/terrarium/"+terrarium_id); 
+            window.location.assign("/terrarium/"+terrarium_id);
         });
 
         $('#terrariums').dataTable({

@@ -107,6 +107,7 @@ def get_weight_chart(animal_id):
 
 def _build_animal_dict(animal, animal_type, weight_setting):
     from history.models import History
+    from feeding.models import Feeding
     try:
         current_weight = (
             History.objects
@@ -119,6 +120,17 @@ def _build_animal_dict(animal, animal_type, weight_setting):
         current_weight = "0"
 
     weight_value, weight_unit = _parse_weight(current_weight)
+
+    try:
+        last_feeding = (
+            Feeding.objects
+            .filter(animal=animal)
+            .order_by('-date')
+            .values_list('date', flat=True)
+            .first()
+        )
+    except Exception:
+        last_feeding = None
 
     if animal_type:
         art_name = animal_type.name
@@ -153,6 +165,7 @@ def _build_animal_dict(animal, animal_type, weight_setting):
         'current_weight_value': weight_value or 0,
         'current_weight_unit': weight_unit or 'g',
         'feeding_size': feeding_size,
+        'last_feeding': last_feeding,
     }
 
 

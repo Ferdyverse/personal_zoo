@@ -28,6 +28,9 @@
 {% block content %}
 
 {% set image = url_for("uploaded_file", folder='animals', filename=animal.image) %}
+<div class="mb-3">
+    <a href="/" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> {{ _("Back") }}</a>
+</div>
 <div class="row mb-4 ">
     <div class="col">
         <div class="card">
@@ -43,8 +46,8 @@
                                 &nbsp;<i class="fa-solid {% if animal.gender == 'female' %} fa-venus female {% elif animal.gender == 'male' %} fa-mars male {% else %}  fa-transgender ambiguous {% endif %} d-sm-inline-block"></i>
                             </span>
                         </div>
-                        <div>{{ animal.morph }}</div>
-                        <div class="text-muted">{{ animal.art }} (*{{ animal.birth }})</div>
+                        {% if animal.morph %}<div>{{ animal.morph }}</div>{% endif %}
+                        <div class="text-muted">{{ animal.art }}{% if animal.birth %} (*{{ animal.birth }}){% endif %}</div>
                     </div>
                     {% if animal.current_weight != "0" %}
                     <div class="px-4 text-center border-start border-danger user-select-none clickable animal_show_weight">
@@ -193,7 +196,11 @@
                 </div>
             </div>
             <div class="card-body">
-                {{ animal.notes|linebreaksbr|safe }}
+                {% if animal.notes %}
+                    {{ animal.notes|linebreaksbr|safe }}
+                {% else %}
+                    <p class="text-muted mb-0">{{ _("No notes.") }}</p>
+                {% endif %}
             </div>
             <div class="card-footer text-right pr-0">
                 <div style="text-transform: uppercase;">{{ _("Last updated:") }} {{ animal.updated_date | dateformat }}</div>
@@ -214,13 +221,13 @@
     $(document).ready(function(){
         $('.show_animal_image').click(function(){
             $('.modal-content').html('<div class="modal-body"><img src="{{ image }}" class="rounded img-fluid mx-auto"></div>')
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
         $('.show_all_history').click(function(){
             var less = "{{ _("less") }}";
             if ($(this).html().includes(less)) {
                 url = '/history/get_all/{{ animal.id }}?less=1'
-                $('.show_all_history').html('<div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>');                
+                $('.show_all_history').html('<div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>');
             } else {
                 url = '/history/get_all/{{ animal.id }}'
                 $('.show_all_history').html('<div style="text-transform: uppercase;"> <i class="fa-solid fa-chevron-left"></i> {{ _("Show less") }}</div>');
@@ -237,7 +244,7 @@
             var less = "{{ _("less") }}";
             if ($(this).html().includes(less)) {
                 url = '/feeding/get_all/{{ animal.id }}?less=1'
-                $('.show_all_feedings').html('<div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>');                
+                $('.show_all_feedings').html('<div style="text-transform: uppercase;">{{ _("Show all") }} <i class="fa-solid fa-chevron-right"></i></div>');
             } else {
                 url = '/feeding/get_all/{{ animal.id }}'
                 $('.show_all_feedings').html('<div style="text-transform: uppercase;"> <i class="fa-solid fa-chevron-left"></i> {{ _("Show less") }}</div>');
@@ -253,7 +260,7 @@
     });
     $('.animal_show_weight').on('click',function(){
         $('.modal-content').load('/animal/get_weight/{{ animal.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
     });
     {% if request.user.is_authenticated %}
@@ -262,22 +269,22 @@
         $.ajax({
             url: '/feeding/edit/'+feed_id,
             type: 'get',
-            success: function(data){ 
-                $('.modal-content').html(data); 
+            success: function(data){
+                $('.modal-content').html(data);
                 $('.modal-content').append(data.htmlresponse);
                 $('#modal_details').modal('show');
                 $('.feeding_delete_button').click(function(){
                     var feed_id = $(this).data('id');
-                    if (confirm("Are You Sure ?")) {
+                    confirmAction("Are You Sure ?", function() {
                         $.ajax({
                                 url: '/feeding/delete/'+feed_id+'/',
                                 type: 'post',
                                 data: {},
                                 success: function(data) {
-                                    location.reload(true); 
+                                    location.reload(true);
                                 }
                             });
-                    }
+                    });
                 });
             }
         });
@@ -287,22 +294,22 @@
         $.ajax({
             url: '/history/edit/'+feed_id,
             type: 'get',
-            success: function(data){ 
-                $('.modal-content').html(data); 
+            success: function(data){
+                $('.modal-content').html(data);
                 $('.modal-content').append(data.htmlresponse);
                 $('#modal_details').modal('show');
                 $('.history_delete_button').click(function(){
                     var feed_id = $(this).data('id');
-                    if (confirm("Are You Sure ?")) {
+                    confirmAction("Are You Sure ?", function() {
                         $.ajax({
                                 url: '/history/delete/'+feed_id+'/',
                                 type: 'post',
                                 data: {},
                                 success: function(data) {
-                                    location.reload(true); 
+                                    location.reload(true);
                                 }
                             });
-                    }
+                    });
                 });
             }
         });
@@ -312,29 +319,29 @@
         $.ajax({
             url: '/document/edit/'+feed_id,
             type: 'get',
-            success: function(data){ 
-                $('.modal-content').html(data); 
+            success: function(data){
+                $('.modal-content').html(data);
                 $('.modal-content').append(data.htmlresponse);
                 $('#modal_details').modal('show');
                 $('.document_delete_button').click(function(){
                     var feed_id = $(this).data('id');
-                    if (confirm("Are You Sure ?")) {
+                    confirmAction("Are You Sure ?", function() {
                         $.ajax({
                                 url: '/document/delete/'+feed_id+'/',
                                 type: 'post',
                                 data: {},
                                 success: function(data) {
-                                    location.reload(true); 
+                                    location.reload(true);
                                 }
                             });
-                    }
+                    });
                 });
             }
         });
     });
     $('.feeding_add_button').on('click',function(){
         $('.modal-content').load('/feeding/add/{{ animal.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
     });
     $('.history_add_button').on('click',function(){
@@ -344,32 +351,32 @@
     });
     $('.animal_qr_button').on('click',function(){
         $('.modal-content').load('/feeding/get_qr/{{ animal.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
     })
     $('.document_add_button').on('click',function(){
         $('.modal-content').load('/document/add/animal/{{ animal.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
         });
     });
     $('.animal_print_button').on('click',function(){
-        window.open('/animal/{{ animal.id }}?print=1', '_blank'); 
+        window.open('/animal/{{ animal.id }}?print=1', '_blank');
     });
     $('.animal_edit_button').on('click',function(){
         $('.modal-content').load('/animal/edit/{{ animal.id }}',function(){
-            $('#modal_details').modal('show'); 
+            $('#modal_details').modal('show');
             $('.animal_delete_button').click(function(){
                                 var animal_id = $(this).data('id');
-                                if (confirm("Are You Sure ?")) {
+                                confirmAction("Are You Sure ?", function() {
                                     $.ajax({
                                             url: '/animal/delete/'+animal_id+'/',
                                             type: 'post',
                                             data: {animal_id: {{ animal.id }}},
                                             success: function(data) {
-                                                window.location.replace("/"); 
+                                                window.location.replace("/");
                                             }
                                         });
-                                }
+                                });
                             });
         });
     });

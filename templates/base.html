@@ -4,6 +4,11 @@
 <head>
     <title>{% block title %}{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#22c55e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Personal Zoo">
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.css') }}">
@@ -56,6 +61,18 @@
         </div>
     {% endif %}
 
+    {% if notifications is defined and notifications %}
+    <div class="container mt-2">
+        {% for notif in notifications %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <i class="fa-solid fa-bell me-2"></i>
+            <strong>{{ notif.date | dateformat }}:</strong> {{ notif.message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="container">
         <p>&nbsp;</p>
         {% block content %}{% endblock %}
@@ -87,5 +104,32 @@
             }
         </script>
     {% endif %}
+
+<div class="modal fade" id="confirm_modal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ _("Are you sure?") }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="confirm_modal_body">{{ _("This action cannot be undone.") }}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{{ _("Cancel") }}</button>
+        <button type="button" class="btn btn-danger btn-sm" id="confirm_modal_ok">{{ _("Delete") }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function confirmAction(message, callback) {
+    $('#confirm_modal_body').text(message);
+    var modal = new bootstrap.Modal(document.getElementById('confirm_modal'));
+    modal.show();
+    $('#confirm_modal_ok').off('click').on('click', function() {
+        modal.hide();
+        callback();
+    });
+}
+</script>
 </body>
 </html>
