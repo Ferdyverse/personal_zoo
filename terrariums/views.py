@@ -20,7 +20,7 @@ def terrarium_detail(request, id):
         'terrarium': terrarium_data,
         'equipment': get_te(None, terrarium_data['id']),
         'lamps': get_tl(None, terrarium_data['id']),
-        'terrarium_history': get_thd(None, terrarium_data['id']),
+        'terrarium_history': get_thd(None, terrarium_data['id'], limit=5),
     })
 
 
