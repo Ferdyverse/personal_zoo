@@ -68,19 +68,8 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle"><div class="flex-shrink-1 text-break fw-normal">{{ animal.art }}</div></td>
-                                            <td class="align-middle">
-                                                {% if animal.last_feeding %}
-                                                    {% set days = (now().date() - animal.last_feeding).days %}
-                                                    {% if days <= 7 %}
-                                                        <span class="badge bg-success">{{ days }} {{ _("days ago") }}</span>
-                                                    {% elif days <= 14 %}
-                                                        <span class="badge bg-warning text-dark">{{ days }} {{ _("days ago") }}</span>
-                                                    {% else %}
-                                                        <span class="badge bg-danger">{{ days }} {{ _("days ago") }}</span>
-                                                    {% endif %}
-                                                {% else %}
-                                                    <span class="badge bg-danger">{{ _("Never") }}</span>
-                                                {% endif %}
+                                            <td class="align-middle text-muted small">
+                                                {{ animal.last_feeding | dateformat if animal.last_feeding else '—' }}
                                             </td>
                                             <td class="align-middle text-end">
                                                 <button class="btn btn-sm green_button quick_feed_btn" data-id="{{ animal.id }}" data-name="{{ animal.name }}" title="{{ _('Add feeding') }}">
